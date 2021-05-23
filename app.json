@@ -17,9 +17,15 @@
       "**/*"
     ],
     "ios": {
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~1458002511"
+      },
       "supportsTablet": true
     },
     "android": {
+      "config": {
+              "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
+      },
       "package": "com.danptec.inbus",
       "versionCode": 1
     },

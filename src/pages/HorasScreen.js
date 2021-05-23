@@ -1,12 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import { View, Text, FlatList, StyleSheet,SafeAreaView, TouchableOpacity, TouchableHighlight,Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, SafeAreaView, TouchableOpacity, TouchableHighlight, Modal } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import AdMob from '../components/AdMob.js';
+
 Icon.loadFont();
 
-export default function HorasScreen (){
-    
+export default function HorasScreen() {
+
     const route = useRoute();
     const navigation = useNavigation();
 
@@ -15,10 +17,10 @@ export default function HorasScreen (){
     const [linhas_completa, setLinhaCompleta] = useState([]);
     const [horas_BC, setHorasBC] = useState(linhas_completa.UTEIS_BC);
     const [horas_CB, setHorasCB] = useState(linhas_completa.UTEIS_CB);
-    
+
     const [itinerarios, setItinerarios] = useState(linhas_completa.ITIN);
     const [linha, setLinha] = useState('');
-    
+
     const [itin_completo, setItinCompleto] = useState([]);
 
     const [activeSentido, setActiveSentido] = useState(null);
@@ -27,8 +29,8 @@ export default function HorasScreen (){
 
 
 
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         setLinhaCompleta(route_linha);
         setHorasBC(linhas_completa.UTEIS_BC);
         setHorasCB(linhas_completa.UTEIS_CB);
@@ -36,157 +38,160 @@ export default function HorasScreen (){
         setActiveSentido(1);
         setActiveDias(1);
 
-    },[]);
+    }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
 
         setItinerarios(linhas_completa.ITIN);
 
-        if(activeDias===1) {
+        if (activeDias === 1) {
             setHorasBC(linhas_completa.UTEIS_BC);
             setHorasCB(linhas_completa.UTEIS_CB);
-        }else if(activeDias===2){
+        } else if (activeDias === 2) {
             setHorasBC(linhas_completa.SAB_BC);
             setHorasCB(linhas_completa.SAB_CB);
-        }else{
+        } else {
             setHorasBC(linhas_completa.DOM_BC);
             setHorasCB(linhas_completa.DOM_CB);
-        }       
+        }
 
-    },[activeDias]);
+    }, [activeDias]);
 
-    const getLinhas = (ordem)=>{
+    const getLinhas = (ordem) => {
         const it = itinerarios.find(item => item.ORDEM == ordem);
         return it.NOME_RUA;
     }
-    
-    useEffect(()=>{
 
-        async function fatchData(){
+    useEffect(() => {
+
+        async function fatchData() {
             //setStatusLoadLinhas(true);
             const response = await fetch(`https://ngs.inf.br/viamao/horarios/getItinerarios.php?LINHA=${linha}`);
             const textData = await response.text();
             const jsonData = await JSON.parse(textData.trim());
-         
+
             //setStatusLoadLinhas(false); 
-  
+
             //setItinCompleto(jsonData);
 
             return jsonData;
         }
-      
-        if (linha!==''){
-            fatchData().then((data)=>{
+
+        if (linha !== '') {
+            fatchData().then((data) => {
                 setItinCompleto(data);
-            }); 
+            });
         }
 
-    },[linha]);
+    }, [linha]);
 
-    useEffect(()=>{
+    useEffect(() => {
 
-        if (linha!==''){
+        if (linha !== '') {
             console.log(itin_completo[0]);
             navigation.navigate("itins", {
-                itins_completo:itin_completo[0],
-                name:"ITINERARIO COMPLETO"
+                itins_completo: itin_completo[0],
+                name: "ITINERARIO COMPLETO"
             });
-                
-            setLinha(''); 
+
+            setLinha('');
         }
-        
-    },[itin_completo])
-    
+
+    }, [itin_completo])
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.top_sw}>
-                
-                <TouchableOpacity style={[styles.top_sw_item, activeSentido === 1 ? styles.top_sw_item_selected : {}]}  onPress={()=>setActiveSentido(1)}>                
-                    <Text style={{textAlign:"center"}, activeSentido === 1 ? {color:"#000"} : {color:"#999"}}>IDA</Text>
+
+                <TouchableOpacity style={[styles.top_sw_item, activeSentido === 1 ? styles.top_sw_item_selected : {}]} onPress={() => setActiveSentido(1)}>
+                    <Text style={{ textAlign: "center" }, activeSentido === 1 ? { color: "#000" } : { color: "#999" }}>IDA</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.top_sw_item, activeSentido === 2 ? styles.top_sw_item_selected : {}]} onPress={()=>setActiveSentido(2)}>
-                    <Text style={{textAlign:"center"}, activeSentido === 2 ? {color:"#000"} : {color:"#999"}}>VOLTA</Text>    
+                <TouchableOpacity style={[styles.top_sw_item, activeSentido === 2 ? styles.top_sw_item_selected : {}]} onPress={() => setActiveSentido(2)}>
+                    <Text style={{ textAlign: "center" }, activeSentido === 2 ? { color: "#000" } : { color: "#999" }}>VOLTA</Text>
                 </TouchableOpacity>
-                
+
             </View>
 
             <ScrollView vertical>
                 <View>
                     <FlatList
-                        data={activeSentido === 1 ?  horas_BC : horas_CB} 
+                        data={activeSentido === 1 ? horas_BC : horas_CB}
                         keyExtractor={item => item.HR_IV}
-                        renderItem={({item})=>(
-                            
-                             item.HR_IV != "" ?
-                                <TouchableOpacity style={styles.linhas_item} onPress={()=>setLinha(item.LINHA)}>
+                        renderItem={({ item }) => (
+
+                            item.HR_IV != "" ?
+                                <TouchableOpacity style={styles.linhas_item} onPress={() => setLinha(item.LINHA)}>
                                     <View style={styles.linhas_item_hora}>
 
                                         <Text style={styles.hora_text}>{item.HR_IV}</Text>
-                                
+
                                         {
                                             item.APDVGM == "SIM" ?
-                                                <Icon name="accessible" size={25} color="#ea5455"  />
-                                            : null
+                                                <Icon name="accessible" size={25} color="#ea5455" />
+                                                : null
                                         }
-                                
+
                                     </View>
-                                
-                            
+
+
                                     <View style={styles.linhas_item_etinerario}>
-                                
+
                                         <Text style={styles.linha_text}>{getLinhas(item.ORDEM)}</Text>
-                                
+
                                     </View>
-                                
+
                                 </TouchableOpacity>
-                        
-                            :null
-                            
-                        )}  
+
+                                : null
+
+                        )}
                     />
                 </View>
             </ScrollView>
 
             <View style={styles.botton_sw}>
-                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 1 ? styles.botton_sw_item_selected : {}]}  onPress={()=>setActiveDias(1)}>
-                
-                    <Text style={{textAlign:"center"}, activeDias === 1 ? {color:"#000"} : {color:"#999"}}>Segunda a Sexta</Text>
-                
+                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 1 ? styles.botton_sw_item_selected : {}]} onPress={() => setActiveDias(1)}>
+
+                    <Text style={{ textAlign: "center" }, activeDias === 1 ? { color: "#000" } : { color: "#999" }}>Segunda a Sexta</Text>
+
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 2 ? styles.botton_sw_item_selected : {}]} onPress={()=>setActiveDias(2)}>
-                
-                    <Text style={{textAlign:"center"}, activeDias === 2 ? {color:"#000"} : {color:"#999"}}>Sábados</Text>
-                
+                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 2 ? styles.botton_sw_item_selected : {}]} onPress={() => setActiveDias(2)}>
+
+                    <Text style={{ textAlign: "center" }, activeDias === 2 ? { color: "#000" } : { color: "#999" }}>Sábados</Text>
+
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 3 ? styles.botton_sw_item_selected : {}]} onPress={()=>setActiveDias(3)}>
-                
-                    <Text style={{textAlign:"center"}, activeDias === 3 ? {color:"#000"} : {color:"#999"}}>Domingos e Feriados</Text>
-                
+                <TouchableOpacity style={[styles.botton_sw_item, activeDias === 3 ? styles.botton_sw_item_selected : {}]} onPress={() => setActiveDias(3)}>
+
+                    <Text style={{ textAlign: "center" }, activeDias === 3 ? { color: "#000" } : { color: "#999" }}>Domingos e Feriados</Text>
+
                 </TouchableOpacity>
             </View>
+
+            <AdMob />
+
         </SafeAreaView>
-        
+
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-       flex:1,
+        flex: 1,
         backgroundColor: '#fff',
     },
     botton_sw: {
         height: '10%',
         borderTopColor: "#ccc",
         borderTopWidth: 1,
-        flexDirection:"row",
+        flexDirection: "row",
     },
     botton_sw_item: {
         width: '33.33%',
         justifyContent: "center",
-        alignItems: "center",  
+        alignItems: "center",
     },
     botton_sw_item_selected: {
         borderTopWidth: 2,
@@ -196,12 +201,12 @@ const styles = StyleSheet.create({
         height: '10%',
         borderBottomColor: "#ccc",
         borderBottomWidth: 1,
-        flexDirection:"row",
+        flexDirection: "row",
     },
     top_sw_item: {
         width: '50%',
         justifyContent: "center",
-        alignItems: "center",       
+        alignItems: "center",
     },
     top_sw_item_selected: {
         borderBottomWidth: 2,
@@ -237,7 +242,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRightWidth: 1,
         borderRightColor: "#ccc"
-      },
+    },
     linha_text: {
         fontSize: 12,
         marginLeft: 15,
@@ -266,8 +271,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
-          width: 0,
-          height: 2
+            width: 0,
+            height: 2
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,

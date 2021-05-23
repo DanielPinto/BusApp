@@ -3,6 +3,8 @@ import { View, Text, FlatList, StyleSheet,SafeAreaView, TouchableOpacity, Toucha
 import { useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import AdMob from '../components/AdMob.js';
+
 Icon.loadFont();
 
 export default function ItinScreen (){
@@ -60,6 +62,8 @@ export default function ItinScreen (){
                         )}  />
                 </View>
             </ScrollView>
+
+            <AdMob/>
 
             
         </SafeAreaView>
