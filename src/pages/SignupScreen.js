@@ -1,70 +1,96 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Button, Text, StyleSheet, View, TextInput, Alert } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import {registration} from '../methods/firebaseMethods';
 
 
 export default SignupScreen = () => {
 
-    const route = useRoute();
     const navigation = useNavigation();
 
-    const [username, setUsername] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-
-    const createAccount = () => {
-        Alert.alert(
-            "Sign Up",
-            "Foi enviado um email de Verificação para: \n\n" +
-            email + "\n\n" +
-            "Valide seu Email para Logar",
-
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                { text: "OK", onPress: () => console.log("OK Pressed") }
-            ]
-        )
-
+    const emptyState = () => {
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
     };
 
-    const getLoginScreen = () =>  navigation.navigate("Login");;
+    const handlePress = () => {
+        if (!firstName) {
+            Alert.alert('First name is required');
+        } else if (!email) {
+            Alert.alert('Email field is required.');
+        } else if (!password) {
+            Alert.alert('Password field is required.');
+        } else if (!confirmPassword) {
+            setPassword('');
+            Alert.alert('Confirm password field is required.');
+        } else if (password !== confirmPassword) {
+            Alert.alert('Password does not match!');
+        } else {
+            registration(
+                email,
+                password,
+                lastName,
+                firstName,
+            );
+            navigation.navigate('Loading');
+            emptyState();
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <View>
                 <Text style={styles.textTitle}>Sign Up</Text>
                 <TextInput
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                    placeholder={'Username'}
+                    value={firstName}
+                    onChangeText={(name) => setFirstName(name)}
+                    placeholder={'First Name*'}
                     style={styles.input}
                 />
                 <TextInput
+                    placeholder="Last name"
+                    value={lastName}
+                    onChangeText={(name) => setLastName(name)}
+                    style={styles.input}
+                />
+
+                <TextInput
+                    placeholder="Enter your email*"
                     value={email}
-                    onChangeText={text => setEmail(text)}
-                    placeholder={'E-mail'}
+                    onChangeText={(email) => setEmail(email)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                     style={styles.input}
                 />
 
                 <TextInput
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    placeholder={'Password'}
-                    secureTextEntry={true}
                     style={styles.input}
+                    placeholder="Enter your password*"
+                    value={password}
+                    onChangeText={(password) => setPassword(password)}
+                    secureTextEntry={true}
                 />
-
-
+                <TextInput
+                    style={styles.input}
+                    placeholder="Retype your password to confirm*"
+                    value={confirmPassword}
+                    onChangeText={(password2) => setConfirmPassword(password2)}
+                    secureTextEntry={true}
+                />
 
                 <Button
                     title={'Enviar'}
                     style={styles.input}
-                    onPress={() => createAccount()}
+                    onPress={handlePress}
                 />
 
 
@@ -89,7 +115,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     textTitle: {
-        
+
         marginBottom: 10,
         fontSize: 25,
         fontWeight: 'bold'

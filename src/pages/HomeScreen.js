@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { StyleSheet, View, Text, FlatList, ActivityIndicator } from 'react-native';
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { StyleSheet, View, Text, FlatList, ActivityIndicator, TouchableOpacity, BackHandler, Alert} from 'react-native';
+import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { loggingOut } from '../methods/firebaseMethods';
 import AdMob from '../components/AdMob.js';
 
 
@@ -18,11 +19,34 @@ export default function HomeScreen() {
   const [statusLoadLinhas, setStatusLoadLinhas] = useState(false);
 
   const navigation = useNavigation();
-
-
-
   useEffect(() => {
-    /*
+    setSelectedServico("Metropolitano");
+    const backAction = () => {
+      Alert.alert("Você deseja encerrar este aplicativo?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel"
+        },
+        { 
+          text: "YES",
+          onPress: () => BackHandler.exitApp() 
+        }
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  /*
+  useEffect(() => {
+  
     async function fatchData(){
         const response = await fetch('https://ngs.inf.br/viamao/horarios/getServico.php');
         const textData = await response.text();
@@ -30,12 +54,12 @@ export default function HomeScreen() {
       
         setServicos(jsonData);
     }
-  */
+ 
 
     setSelectedServico("Metropolitano");
 
   }, []);
-
+ */
 
   useEffect(() => {
 
@@ -79,9 +103,19 @@ export default function HomeScreen() {
   }, [linha_selected !== '']);
 
 
+  const handlePress = () => {
+    loggingOut();
+    navigation.replace('Loading');
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
+
+      <TouchableOpacity onPress={() => handlePress()}>
+        <Text> SAIR </Text>
+      </TouchableOpacity>
+
       <View style={styles.menu}>
 
 
@@ -90,7 +124,7 @@ export default function HomeScreen() {
             onPress={() => setSelectedServico("Executivo")}
             style={styles.item}
           >
-            <Icon name="bus" color="#ea5455" size={32} />
+            <MaterialCommunityIcons name="bus" color="#ea5455" size={32} />
 
           </TouchableOpacity>
 
@@ -98,18 +132,15 @@ export default function HomeScreen() {
 
         </View>
 
-
         <View style={{ marginHorizontal: 22, alignItems: "center" }}>
-
           <TouchableOpacity
             onPress={() => setSelectedServico("Metropolitano")}
             style={styles.item}
           >
-
-            <Icon name="bus" color="#3490de" size={32} />
+            <MaterialCommunityIcons name="bus" color="#3490de" size={32} />
           </TouchableOpacity>
 
-          <Text>Metropolitano</Text>
+          <Text> Metropolitano</Text>
         </View>
 
 
@@ -118,7 +149,7 @@ export default function HomeScreen() {
             onPress={() => setSelectedServico("Municipal")}
             style={styles.item}
           >
-            <Icon name="bus" color="#ffc93c" size={32} />
+            <MaterialCommunityIcons name="bus" color="#ffc93c" size={32} />
 
           </TouchableOpacity>
 
@@ -134,7 +165,7 @@ export default function HomeScreen() {
             onPress={() => setSelectedServico("Seletivo")}
             style={styles.item}
           >
-            <Icon name="bus" color="#8c7676" size={32} />
+            <MaterialCommunityIcons name="bus" color="#8c7676" size={32} />
           </TouchableOpacity>
 
           <Text>Seletivo</Text>
@@ -144,8 +175,8 @@ export default function HomeScreen() {
 
       </View>
       {
-        statusLoadLinhas ?
-
+        statusLoadLinhas
+          ?
           <ActivityIndicator size="large" color="#000" style={{ justifyContent: "center", alignItems: "center", marginTop: 50 }} />
           :
 
@@ -158,7 +189,7 @@ export default function HomeScreen() {
                   <TouchableOpacity onPress={() => setSelectedLinha(item.NOME_GRUPO)}>
                     <View style={styles.linhas_item}>
                       <Text style={styles.linha_text} >{item.NOME_GRUPO}</Text>
-                      <Icon style={styles.linha_icon} name="chevron-right" color="#666" size={32} />
+                      <MaterialCommunityIcons style={styles.linha_icon} name="chevron-right" color="#666" size={32} />
                     </View>
                   </TouchableOpacity>
 
@@ -170,7 +201,7 @@ export default function HomeScreen() {
       }
 
       <AdMob />
-  
+
     </SafeAreaView>
   );
 

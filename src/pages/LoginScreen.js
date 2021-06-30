@@ -1,73 +1,79 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Button, Text, StyleSheet, View, TextInput, Alert } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { SafeAreaView, Button, Text, StyleSheet, View, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { signIn } from '../methods/firebaseMethods';
+
 
 export default LoginScreen = () => {
 
-    const route = useRoute();
     const navigation = useNavigation();
 
-    const [username, setUsername] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [load, setLoad] = useState(false);
 
+   
 
-    const onLogin = () => {
-        Alert.alert(
-            "Login",
-            "Name: " + username + "\n" +
-            "Password" + password,
+    const handlePress = () => {
+        if (!email) {
+            Alert.alert('Email field is required.');
+        }
 
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                { text: "OK", onPress: () => console.log("OK Pressed") }
-            ]
-        )
+        if (!password) {
+            Alert.alert('Password field is required.');
+        }
 
+        setLoad(true);
+
+        signIn(email, password).then((value) => {
+            setLoad(false);
+        })
+        setEmail('');
+        setPassword('');
     };
-
-    const accountScreen = () => navigation.navigate("Signup");
-
 
     return (
         <SafeAreaView style={styles.container}>
-            <View>
-                <Text style={styles.textTitle}>Login</Text>
-                <TextInput
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                    placeholder={'email'}
-                    style={styles.input}
-                />
-                <TextInput
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    placeholder={'Password'}
-                    secureTextEntry={true}
-                    style={styles.input}
-                />
+            {
+                load
+                    ?
+                    <ActivityIndicator size='large' color="blue" />
+                    :
+                    <View>
+                        <Text style={styles.textTitle}>Login</Text>
+                        <TextInput
+                            value={email}
+                            onChangeText={text => setEmail(text)}
+                            placeholder={'email'}
+                            style={styles.input}
+                        />
+                        <TextInput
+                            value={password}
+                            onChangeText={text => setPassword(text)}
+                            placeholder={'Password'}
+                            secureTextEntry={true}
+                            style={styles.input}
+                        />
 
 
 
-                <Button
-                    title={'Login'}
-                    style={styles.input}
-                    onPress={() => onLogin()}
-                />
+                        <Button
+                            title={'Login'}
+                            style={styles.input}
+                            onPress={handlePress}
+                        />
 
 
+                        <Text
+                            style={styles.textAccountCreate}
+                            onPress={() => navigation.navigate("Signup")}
+                        >
+                            criar conta
+                        </Text>
 
-                <Text
-                    style={styles.textAccountCreate}
-                    onPress={() => accountScreen()}
-                >
-                    criar conta
-                </Text>
+                    </View>
+            }
 
-            </View>
 
         </SafeAreaView>
     )
@@ -81,7 +87,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     textTitle: {
-        
+
         marginBottom: 10,
         fontSize: 25,
         fontWeight: 'bold'

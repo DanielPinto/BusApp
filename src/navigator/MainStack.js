@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../pages/HomeScreen';
 import HorasScreen from '../pages/HorasScreen';
 import ItinsScreen from '../pages/ItinScreen';
+import LoadingScreen from '../pages/LoadingScreen'
 import LoginScreen from '../pages/LoginScreen';
 import SignupScreen from '../pages/SignupScreen';
 
@@ -12,6 +13,12 @@ const MainStack = createStackNavigator();
 
 export default () => (
     <MainStack.Navigator>
+       
+       <MainStack.Screen
+            options={{ headerShown: false }}
+            name="Loading"
+            component={LoadingScreen}
+        />
         <MainStack.Screen
             options={{ headerShown: false }}
             name="Login"
@@ -26,7 +33,7 @@ export default () => (
 
 
         <MainStack.Screen
-            options={{ headerShown: false }, ({ route }) => ({ title: route.params.name })}
+            options={{ headerShown: false }}
             name="HOME"
             component={HomeScreen}
         />
